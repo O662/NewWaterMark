@@ -1,0 +1,19 @@
+name: watermark_engine
+description: >-
+  Pure-Dart engine for embedding and recovering invisible zero-width Unicode
+  watermarks in text, used to prove document authorship. No Flutter dependency.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  # sha256 for the document fingerprint (pure Dart, official Dart team).
+  crypto: ^3.0.0
+  # Ed25519 keypairs / sign / verify (pure Dart, works on every target incl. web).
+  ed25519_edwards: ^0.3.1
+
+dev_dependencies:
+  lints: ^5.1.0
+  test: ^1.25.0

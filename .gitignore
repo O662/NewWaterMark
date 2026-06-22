@@ -1,0 +1,19 @@
+# Dart / Flutter build + tool artifacts
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.claude/
+
+# Editor / IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pub: lockfiles are kept for the app, ignored for the pure-Dart library package
+packages/watermark_engine/pubspec.lock
