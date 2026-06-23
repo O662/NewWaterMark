@@ -18,6 +18,12 @@ class IdentityService extends ChangeNotifier {
   bool get isLoading => _loading;
   Object? get error => _error;
 
+  /// Whether this platform can hold a private signing identity. The web cannot
+  /// store a key securely (a browser has no keychain), so on web identities are
+  /// not created here — signing happens on the desktop/mobile apps, while the
+  /// web build still verifies seals (which needs no secret).
+  bool get canManageIdentity => !kIsWeb;
+
   Future<void> load() async {
     try {
       _identity = await _store.load();
@@ -31,8 +37,9 @@ class IdentityService extends ChangeNotifier {
   }
 
   /// Generates and persists a fresh identity for [authorId], replacing any
-  /// existing one.
+  /// existing one. A no-op where identities cannot be managed (web).
   Future<void> create(String authorId) async {
+    if (!canManageIdentity) return;
     final identity = AuthorIdentity.generate(authorId);
     await _store.save(identity);
     _identity = identity;

@@ -144,7 +144,20 @@ class _MarkScreenState extends State<MarkScreen> {
     final templates = context.watch<TemplateService>();
     final identity = context.watch<IdentityService>();
     final docs = context.read<DocumentService>();
-    final secure = _mode == _MarkMode.secure;
+    final canSecure = identity.canManageIdentity;
+    final secure = canSecure && _mode == _MarkMode.secure;
+
+    final signatureSource = _SignatureSource(
+      templates: templates,
+      source: _source,
+      onSourceChanged: (s) => setState(() => _source = s),
+      savedName: _savedName,
+      onSavedChanged: (n) => setState(() => _savedName = n),
+      customController: _customSig,
+      customNameController: _customName,
+      saveCustom: _saveCustom,
+      onSaveCustomChanged: (v) => setState(() => _saveCustom = v),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -163,44 +176,41 @@ class _MarkScreenState extends State<MarkScreen> {
             ),
           ),
           const SizedBox(height: 28),
-          LabeledSection(
-            title: 'Watermark type',
-            icon: Icons.shield_outlined,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SegmentedButton<_MarkMode>(
-                  segments: const [
-                    ButtonSegment(
-                        value: _MarkMode.plain,
-                        icon: Icon(Icons.draw_outlined),
-                        label: Text('Signature')),
-                    ButtonSegment(
-                        value: _MarkMode.secure,
-                        icon: Icon(Icons.verified_user_outlined),
-                        label: Text('Secure seal')),
-                  ],
-                  selected: {_mode},
-                  onSelectionChanged: (s) => setState(() => _mode = s.first),
-                ),
-                const SizedBox(height: 16),
-                if (secure)
-                  _SecureSource(identity: identity)
-                else
-                  _SignatureSource(
-                    templates: templates,
-                    source: _source,
-                    onSourceChanged: (s) => setState(() => _source = s),
-                    savedName: _savedName,
-                    onSavedChanged: (n) => setState(() => _savedName = n),
-                    customController: _customSig,
-                    customNameController: _customName,
-                    saveCustom: _saveCustom,
-                    onSaveCustomChanged: (v) => setState(() => _saveCustom = v),
+          if (canSecure)
+            LabeledSection(
+              title: 'Watermark type',
+              icon: Icons.shield_outlined,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SegmentedButton<_MarkMode>(
+                    segments: const [
+                      ButtonSegment(
+                          value: _MarkMode.plain,
+                          icon: Icon(Icons.draw_outlined),
+                          label: Text('Signature')),
+                      ButtonSegment(
+                          value: _MarkMode.secure,
+                          icon: Icon(Icons.verified_user_outlined),
+                          label: Text('Secure seal')),
+                    ],
+                    selected: {_mode},
+                    onSelectionChanged: (s) => setState(() => _mode = s.first),
                   ),
-              ],
+                  const SizedBox(height: 16),
+                  if (secure)
+                    _SecureSource(identity: identity)
+                  else
+                    signatureSource,
+                ],
+              ),
+            )
+          else
+            LabeledSection(
+              title: 'Signature',
+              icon: Icons.draw_outlined,
+              child: signatureSource,
             ),
-          ),
           const SizedBox(height: 28),
           LabeledSection(
             title: 'Density',

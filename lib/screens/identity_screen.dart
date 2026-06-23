@@ -21,10 +21,48 @@ class IdentityScreen extends StatelessWidget {
     if (identity.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
+    if (!identity.canManageIdentity) {
+      return const _WebNote();
+    }
     if (!identity.hasIdentity) {
       return _CreateIdentity(onCreate: (name) => identity.create(name));
     }
     return _IdentityDetails(identity: identity);
+  }
+}
+
+/// Shown on web, where a private signing key cannot be stored securely.
+class _WebNote extends StatelessWidget {
+  const _WebNote();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.devices, size: 64, color: theme.colorScheme.primary),
+            const SizedBox(height: 20),
+            Text('Secure identities live on the app',
+                style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            Text(
+              'A browser has no secure keychain, so your private key is never '
+              'stored here. Create and use your signing identity on the desktop '
+              'or mobile app, where the device keychain protects it.\n\n'
+              'This web version still verifies seals (which needs no secret) and '
+              'adds plain watermarks.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -227,9 +265,9 @@ class _SecurityNote extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Your private key is stored on this device, never sent anywhere. '
-              'Keep your device secure — anyone with your key could forge your '
-              'seals.',
+              'Your private key is kept in this device\'s secure keychain, '
+              'encrypted and never sent anywhere. Keep your device secure — '
+              'anyone with your key could forge your seals.',
               style: Theme.of(context)
                   .textTheme
                   .bodySmall

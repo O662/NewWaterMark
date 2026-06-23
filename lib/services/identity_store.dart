@@ -12,10 +12,9 @@ import 'package:watermark_engine/watermark_engine.dart';
 ///
 /// Only the 32-byte seed is stored; the keypair is regenerated from it on load.
 ///
-/// Security note: the seed is the private key. Here it is stored in the app's
-/// private documents folder (sandboxed on mobile). For stronger protection the
-/// backend can later be swapped for an OS-keychain implementation without
-/// changing this class or the UI.
+/// Security note: the seed is the private key. The app wires this store to a
+/// secure-keychain backend (see SecureStorageBackend), so it is encrypted at
+/// rest. This class is backend-agnostic — it only reads/writes a JSON string.
 class IdentityStore {
   IdentityStore(this._backend);
 

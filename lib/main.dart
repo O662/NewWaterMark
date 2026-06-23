@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:provider/provider.dart';
@@ -11,8 +12,8 @@ import 'services/file_io_service.dart';
 import 'services/identity_service.dart';
 import 'services/identity_store.dart';
 import 'services/pdf/pdf_handler.dart';
-import 'services/platform/identity_backend.dart';
 import 'services/platform/template_backend.dart';
+import 'services/secure_storage_backend.dart';
 import 'services/template_service.dart';
 import 'theme.dart';
 
@@ -23,8 +24,12 @@ Future<void> main() async {
       TemplateService(SignatureTemplateStore(await createTemplateBackend()));
   unawaited(templateService.load());
 
-  final identityService =
-      IdentityService(IdentityStore(await createIdentityBackend()));
+  // Native: private key in the OS secure keychain. Web: in-memory only — no
+  // private key is ever stored in the browser (signing is native-only).
+  final TemplateStorageBackend identityBackend = kIsWeb
+      ? MemoryTemplateStorageBackend()
+      : SecureStorageBackend('watermark.identity');
+  final identityService = IdentityService(IdentityStore(identityBackend));
   unawaited(identityService.load());
 
   // Wire in the real (Flutter-backed) PDF handler, replacing the stub.
