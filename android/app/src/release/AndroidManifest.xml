@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- WaterMark is fully offline. Strip the INTERNET permission from release
+         builds even if a dependency's manifest contributes one, so the shipped
+         app requests no network access. (Debug builds keep it for hot reload.) -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove"/>
+</manifest>
