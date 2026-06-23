@@ -1,6 +1,8 @@
 import 'package:signature_storage/signature_storage.dart';
 
-/// Web/other fallback. In-memory for now; a web build can later swap in a
-/// localStorage/IndexedDB-backed implementation of [TemplateStorageBackend].
+import '../local_storage_backend.dart';
+
+/// Web backend: signature templates persist in the browser's localStorage.
+/// (Templates are not secret; the private signing key is never stored on web.)
 Future<TemplateStorageBackend> createTemplateBackend() async =>
-    MemoryTemplateStorageBackend();
+    LocalStorageBackend('watermark.templates');
